@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.0.5'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'io.freefair.lombok' version '8.0.1'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.20'
 }
 
 group = 'com.bill'
@@ -17,7 +18,6 @@ configurations {
 
 repositories {
     mavenCentral()
-    //jcenter()
 }
 
 dependencies {
@@ -27,12 +27,9 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.32'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.5'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.20"
 
-
-
-/*
-
- */
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -41,8 +38,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core:3.12.4'
     testImplementation 'junit:junit:4.13.1'
-
-
 }
 
 tasks.named('test') {
@@ -52,3 +47,17 @@ tasks.named('test') {
 tasks.withType(JavaCompile) {
     options.annotationProcessorPath = configurations.compileClasspath
 }
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+
+    kotlinOptions {
+        jvmTarget = '17'
+        apiVersion = '1.5'
+        languageVersion = '1.5'
+    }
+
+}
+
+
+

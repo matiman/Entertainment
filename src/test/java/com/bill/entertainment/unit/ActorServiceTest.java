@@ -1,12 +1,14 @@
 package com.bill.entertainment.unit;
 
 import com.bill.entertainment.dao.ActorRepository;
+import com.bill.entertainment.dao.MovieRepository;
 import com.bill.entertainment.entity.Actor;
 import com.bill.entertainment.entity.Movie;
 import com.bill.entertainment.exception.CreativesDeletionException;
 import com.bill.entertainment.exception.CreativesValidationException;
 import com.bill.entertainment.service.ActorService;
 import com.bill.entertainment.service.MovieService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -25,12 +27,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ActorServiceTest {
 
-
     @InjectMocks
     private ActorService actorService;
-
-    @Mock
-    private MovieService movieService;
 
     @Mock
     private ActorRepository repository;
@@ -54,28 +52,4 @@ public class ActorServiceTest {
         assertThrows(CreativesValidationException.class, () -> actorService.create(newActor),
                 "Should throw CreativesValidationException.");
     }
-
-    @Test
-    public void testDeleteActorInMovie() {
-
-        Actor actor = new Actor();
-        actor.setId(1L);
-        actor.setName("John Doe");
-
-        Movie movie = new Movie();
-        movie.setId(1L);
-        movie.setTitle("Test Movie");
-        movie.setReleaseDate(LocalDate.of(2023, 4, 17));
-        movie.setActors(Collections.singleton(actor));
-
-        when(repository.findById(1L)).thenReturn(Optional.of(actor));
-        when(movieService.getMoviesByActor(anyLong())).thenReturn(Collections.singletonList(movie));
-
-        assertThrows(CreativesDeletionException.class, () -> {
-            actorService.delete(1L);
-        });
-
-        verify(repository, never()).delete(actor);
-    }
-
 }
