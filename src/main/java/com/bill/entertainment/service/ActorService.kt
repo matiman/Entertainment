@@ -5,6 +5,7 @@ import com.bill.entertainment.entity.Actor
 import com.bill.entertainment.exception.CreativesDeletionException
 import com.bill.entertainment.exception.CreativesNotFoundException
 import com.bill.entertainment.exception.CreativesValidationException
+import com.bill.entertainment.utility.ErrorMessages
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -19,7 +20,7 @@ open class ActorService : CreativesServiceImpl<Actor?, ActorRepository?>() {
 
     @Throws(CreativesValidationException::class)
     override fun create(actor: Actor?): Actor? {
-        if (!validate(actor)) throw CreativesValidationException("Actor already exists")
+        if (!validate(actor)) throw CreativesValidationException(ErrorMessages.ACTOR_NOT_FOUND)
         return creativesRepository!!.save(actor)
     }
 
@@ -43,12 +44,12 @@ open class ActorService : CreativesServiceImpl<Actor?, ActorRepository?>() {
     override fun delete(id: Long?) {
         val actorOpt = creativesRepository!!.findById(id)
         if (actorOpt.isEmpty) {
-            throw CreativesNotFoundException("Actor with ID $id not found")
+            throw CreativesNotFoundException(ErrorMessages.ACTOR_NOT_FOUND)
         }
         val actor = actorOpt.get()
         val movies = movieService!!.getMoviesByActor(id)
         if (!movies!!.isEmpty()) {
-            throw CreativesDeletionException("Actor with ID $id cannot be deleted because they are part of one more movies.")
+            throw CreativesDeletionException(ErrorMessages.CAN_NOT_DELETE_ACTOR)
         }
         creativesRepository!!.delete(actor)
     }

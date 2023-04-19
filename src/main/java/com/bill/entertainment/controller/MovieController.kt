@@ -6,7 +6,6 @@ import com.bill.entertainment.exception.MediaDeletionException
 import com.bill.entertainment.exception.MediaNotFoundException
 import com.bill.entertainment.exception.MediaValidationException
 import com.bill.entertainment.service.MovieService
-import com.bill.entertainment.utility.ErrorMessages
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -32,42 +31,42 @@ class MovieController {
     @GetMapping("/{id}")
     fun getMovieById(@PathVariable(value = "id") id: Long?): ResponseEntity<String?> {
         return try {
-            movieService!!.getById(id)
-            ResponseEntity.ok(ErrorMessages.SUCCESS)
+            val movie = movieService!!.getById(id)
+            ResponseEntity.ok(movie.toString())
         } catch (e: MediaNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessages.MOVIE_NOT_FOUND)
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createMovie(@RequestBody movie: @Valid Movie?): ResponseEntity<String?> {
         return try {
-            movieService!!.create(movie)
-            ResponseEntity.status(HttpStatus.CREATED).body(ErrorMessages.SUCCESS)
+            val newMovie = movieService!!.create(movie)
+            ResponseEntity.status(HttpStatus.CREATED).body(newMovie.toString())
         } catch (e: MediaValidationException) {
-            ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorMessages.INVALID_INPUT)
+            ResponseEntity.status(HttpStatus.CONFLICT).body(e.message)
         } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.CONFLICT).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(movie.toString())
         }
     }
 
     @PutMapping(path = ["/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun updateMovie(@PathVariable id: Long?, @RequestBody movie: Movie?): ResponseEntity<String?> {
         return try {
-             movieService!!.update(id, movie)
-            ResponseEntity.ok(ErrorMessages.SUCCESS)
+            val updatedMovie = movieService!!.update(id, movie)
+            ResponseEntity.ok(updatedMovie.toString())
         } catch (e: MediaNotFoundException) {
-            ResponseEntity.badRequest().body(ErrorMessages.MOVIE_NOT_FOUND)
+            ResponseEntity.badRequest().body(e.message)
         } catch (e: MediaValidationException) {
-            ResponseEntity.badRequest().body(ErrorMessages.INVALID_INPUT)
+            ResponseEntity.badRequest().body(e.message)
         } catch (e: CreativesNotFoundException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.ACTOR_NOT_FOUND)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
 
@@ -75,13 +74,13 @@ class MovieController {
     fun deleteMovie(@PathVariable id: Long?): ResponseEntity<String?> {
         return try {
             movieService!!.delete(id)
-            ResponseEntity.ok(ErrorMessages.SUCCESS)
+            ResponseEntity.status(HttpStatus.OK).body(HttpStatus.OK.reasonPhrase)
         } catch (e: MediaNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessages.MOVIE_NOT_FOUND)
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         } catch (e: MediaDeletionException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
 }

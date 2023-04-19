@@ -7,6 +7,7 @@ import com.bill.entertainment.exception.CreativesNotFoundException
 import com.bill.entertainment.exception.MediaDeletionException
 import com.bill.entertainment.exception.MediaNotFoundException
 import com.bill.entertainment.exception.MediaValidationException
+import com.bill.entertainment.utility.ErrorMessages
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -24,18 +25,18 @@ open class MovieService : MediaServiceImpl<Movie?, MovieRepository?>() {
             validateMedia(movie, true)
             mediaRepository!!.save(movie)
         } catch (e: MediaValidationException) {
-            throw MediaValidationException(e.message)
+            throw MediaValidationException(ErrorMessages.INVALID_INPUT)
         } catch (e: IllegalArgumentException) {
             throw IllegalArgumentException(e.message)
         } catch (e: CreativesNotFoundException) {
-            throw CreativesNotFoundException(e.message)
+            throw CreativesNotFoundException(ErrorMessages.ACTOR_NOT_FOUND)
         }
     }
 
     @Throws(MediaNotFoundException::class, MediaValidationException::class, CreativesNotFoundException::class)
     override fun update(id: Long?, updatedMovie: Movie?): Movie? {
         val movie = mediaRepository!!.findById(id)
-            .orElseThrow { MediaNotFoundException("Movie with id $id not found") }!!
+            .orElseThrow { MediaNotFoundException(ErrorMessages.MOVIE_NOT_FOUND) }!!
         movie.title= updatedMovie?.title
         movie.releaseDate= updatedMovie?.releaseDate
         movie.actors= updatedMovie?.actors?.toSet() ?: emptySet()
@@ -51,11 +52,11 @@ open class MovieService : MediaServiceImpl<Movie?, MovieRepository?>() {
     @Throws(MediaNotFoundException::class, MediaDeletionException::class)
     override fun delete(id: Long?) {
         val movie = mediaRepository!!.findById(id)
-            .orElseThrow { MediaNotFoundException("Movie with id $id not found") }!!
+            .orElseThrow { MediaNotFoundException(ErrorMessages.MOVIE_NOT_FOUND) }!!
         try {
             mediaRepository!!.delete(movie)
         } catch (e: Exception) {
-            throw MediaDeletionException("Failed to delete movie id: $id", e)
+            throw MediaDeletionException(ErrorMessages.CAN_NOT_DELETE_MOVIE)
         }
     }
 
@@ -67,13 +68,13 @@ open class MovieService : MediaServiceImpl<Movie?, MovieRepository?>() {
         if (isNewMedia && !mediaRepository!!.findByTitleAndReleaseDate(movie.title, movie.releaseDate)!!
                 .isEmpty()
         ) {
-            throw MediaValidationException("Movie with title " + movie.title + " and release date " + movie.releaseDate + " already exists")
+            throw MediaValidationException(ErrorMessages.INVALID_INPUT)
         }
         if (movie.actors.isEmpty()) {
-            throw MediaValidationException("Movie must have at least an actor.")
+            throw MediaValidationException(ErrorMessages.ONE_ACTOR_AT_LEAST)
         }
         for (actor in movie.actors) {
-            if (actorService!!.findById(actor.id).isEmpty) throw CreativesNotFoundException("At least one of the actors isn't present in our database")
+            if (actorService!!.findById(actor.id).isEmpty) throw CreativesNotFoundException(ErrorMessages.ONE_OR_MORE_ACTOR_NOT_IN_DB)
         }
     }
 

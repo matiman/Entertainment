@@ -5,7 +5,6 @@ import com.bill.entertainment.exception.CreativesDeletionException
 import com.bill.entertainment.exception.CreativesNotFoundException
 import com.bill.entertainment.exception.CreativesValidationException
 import com.bill.entertainment.service.ActorService
-import com.bill.entertainment.utility.ErrorMessages;
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -30,12 +29,12 @@ class ActorController {
     @GetMapping("/{id}")
     fun getActorById(@PathVariable id: Long?): ResponseEntity<String?> {
         return try {
-            actorService!!.getById(id)
-            ResponseEntity.ok(ErrorMessages.SUCCESS)
+            val actor = actorService!!.getById(id)
+            ResponseEntity.ok(actor?.toString())
         } catch (e: CreativesNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessages.ACTOR_NOT_FOUND)
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.ACTOR_NOT_FOUND)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
 
@@ -43,11 +42,11 @@ class ActorController {
     fun createActor(@RequestBody newActor: Actor?): ResponseEntity<String?> {
         return try {
             val actor = actorService!!.create(newActor)
-            ResponseEntity.status(HttpStatus.CREATED).body(ErrorMessages.SUCCESS)
+            ResponseEntity.status(HttpStatus.CREATED).body(actor.toString())
         } catch (e: CreativesValidationException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.INVALID_INPUT)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
 
@@ -55,13 +54,13 @@ class ActorController {
     fun updateActor(@PathVariable id: Long?, @RequestBody actor: Actor?): ResponseEntity<String?> {
         return try {
             val updatedActor = actorService!!.update(id, actor)
-            ResponseEntity.ok(ErrorMessages.SUCCESS)
+            ResponseEntity.ok(updatedActor.toString())
         } catch (e: CreativesNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessages.ACTOR_NOT_FOUND)
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         } catch (e: CreativesValidationException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessages.INVALID_INPUT)
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
 
@@ -69,13 +68,13 @@ class ActorController {
     fun deleteActor(@PathVariable id: Long?): ResponseEntity<String?> {
         return try {
             actorService!!.delete(id)
-            ResponseEntity.status(HttpStatus.OK).body(ErrorMessages.SUCCESS)
+            ResponseEntity.status(HttpStatus.OK).body(HttpStatus.OK.reasonPhrase)
         } catch (e: CreativesNotFoundException) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorMessages.ACTOR_NOT_FOUND)
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
         } catch (e: CreativesDeletionException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorMessages.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
 }
