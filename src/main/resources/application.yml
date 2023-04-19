@@ -4,8 +4,8 @@ spring:
     username: root
     password: mysecretpassword
     driver-class-name: com.mysql.cj.jdbc.Driver
-  main:
-    allow-circular-references: true
+# main:
+ #   allow-circular-references: true
   jpa:
     properties:
       hibernate:

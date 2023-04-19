@@ -6,6 +6,7 @@ import com.bill.entertainment.exception.MediaDeletionException
 import com.bill.entertainment.exception.MediaNotFoundException
 import com.bill.entertainment.exception.MediaValidationException
 import com.bill.entertainment.service.MovieService
+import com.bill.entertainment.utility.ErrorMessages
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -83,4 +84,15 @@ class MovieController {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
         }
     }
+
+    @DeleteMapping("/actors/{id}")
+    fun deleteActor(@PathVariable id: Long): ResponseEntity<String> {
+        return try {
+            movieService?.deleteActorNotInMovie(id)
+            ResponseEntity.ok().body(ErrorMessages.SUCCESS)
+        } catch (e: Exception) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.message)
+        }
+    }
+
 }

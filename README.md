@@ -21,22 +21,21 @@ Instructions on how to run the application:
             - curl -X GET http://localhost:8080/api/movies/1
     - Create
         - actor:
-          -curl --header "Content-Type: application/json" --request POST --data '{"name":"Matty Abraham"}' http://localhost:8080/api/actors
+            - curl --header "Content-Type: application/json" --request POST --data '{"name":"Matty Abraham"}' http://localhost:8080/api/actors
         - movie
             - curl -X POST http://localhost:8080/api/movies -H 'Content-Type: application/json' -d '{"title": "Gorzilla 5","releaseDate": "1972-03-24","actors": [{"id": 3}]}'
 
+    - Delete
+        - actor
+            - curl -X DELETE http://localhost:8080/api/actors/3
+        - movie
+            - curl -X DELETE http://localhost:8080/api/movies/2
+    - Update
+        - actor
+            - curl -X PUT http://localhost:8080/api/actors/3 -H 'Content-Type: application/json' -d '{"name": "Mark Bill"}'
 
-- Delete
-    - actor
-        - curl -X DELETE http://localhost:8080/api/actors/3
-    - movie
-        - curl -X DELETE http://localhost:8080/api/movies/2
-- Update
-    - actor
-        - curl -X PUT http://localhost:8080/api/actors/9 -H 'Content-Type: application/json' -d '{"name": "Mark Bill"}'
-
-    - movie
-        -  curl -X PUT http://localhost:8080/api/movies/9 -H 'Content-Type: application/json' -d '{"title": "The Godfather Part II","releaseDate": "1974-12-20","actors": [{"id": 3},{"id": 7}]}'
+        - movie
+            -  curl -X PUT http://localhost:8080/api/movies/1 -H 'Content-Type: application/json' -d '{"title": "The Godfather Part II","releaseDate": "1974-12-20","actors": [{"id": 3},{"id": 7}]}'
 
 
 

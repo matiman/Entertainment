@@ -3,10 +3,7 @@ package com.bill.entertainment.service
 import com.bill.entertainment.dao.MovieRepository
 import com.bill.entertainment.entity.Media
 import com.bill.entertainment.entity.Movie
-import com.bill.entertainment.exception.CreativesNotFoundException
-import com.bill.entertainment.exception.MediaDeletionException
-import com.bill.entertainment.exception.MediaNotFoundException
-import com.bill.entertainment.exception.MediaValidationException
+import com.bill.entertainment.exception.*
 import com.bill.entertainment.utility.ErrorMessages
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -25,7 +22,7 @@ open class MovieService : MediaServiceImpl<Movie?, MovieRepository?>() {
             validateMedia(movie, true)
             mediaRepository!!.save(movie)
         } catch (e: MediaValidationException) {
-            throw MediaValidationException(ErrorMessages.INVALID_INPUT)
+            throw MediaValidationException(e.message)
         } catch (e: IllegalArgumentException) {
             throw IllegalArgumentException(e.message)
         } catch (e: CreativesNotFoundException) {
@@ -68,7 +65,7 @@ open class MovieService : MediaServiceImpl<Movie?, MovieRepository?>() {
         if (isNewMedia && !mediaRepository!!.findByTitleAndReleaseDate(movie.title, movie.releaseDate)!!
                 .isEmpty()
         ) {
-            throw MediaValidationException(ErrorMessages.INVALID_INPUT)
+            throw MediaValidationException(ErrorMessages.DUPLICATE_MOVIE_EXISTS)
         }
         if (movie.actors.isEmpty()) {
             throw MediaValidationException(ErrorMessages.ONE_ACTOR_AT_LEAST)
@@ -77,5 +74,24 @@ open class MovieService : MediaServiceImpl<Movie?, MovieRepository?>() {
             if (actorService!!.findById(actor.id).isEmpty) throw CreativesNotFoundException(ErrorMessages.ONE_OR_MORE_ACTOR_NOT_IN_DB)
         }
     }
+
+    @Throws(CreativesDeletionException::class, CreativesNotFoundException::class)
+    fun deleteActorNotInMovie(actorId: Long) {
+        if (!actorService?.actorExists(actorId)!!) {
+            throw CreativesNotFoundException(ErrorMessages.ACTOR_NOT_FOUND)
+        }
+        val movies = getMoviesByActor(actorId)
+        if (movies != null) {
+            if (movies.isNotEmpty()) {
+                throw CreativesDeletionException(ErrorMessages.CAN_NOT_DELETE_ACTOR_IN_MOVIE)
+            }
+        }
+        try {
+            actorService.delete(actorId)
+        } catch (e: Exception) {
+            throw CreativesDeletionException(ErrorMessages.CAN_NOT_DELETE_ACTOR)
+        }
+    }
+
 
 }

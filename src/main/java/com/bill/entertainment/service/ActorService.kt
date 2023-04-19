@@ -12,15 +12,13 @@ import java.util.*
 
 @Service
 open class ActorService : CreativesServiceImpl<Actor?, ActorRepository?>() {
-    @Autowired
-    private val movieService: MovieService? = null
     fun findById(id: Long?): Optional<Actor?> {
         return creativesRepository!!.findById(id)
     }
 
     @Throws(CreativesValidationException::class)
     override fun create(actor: Actor?): Actor? {
-        if (!validate(actor)) throw CreativesValidationException(ErrorMessages.ACTOR_NOT_FOUND)
+        if (!validate(actor)) throw CreativesValidationException(ErrorMessages.DUPLICATE_ACTOR)
         return creativesRepository!!.save(actor)
     }
 
@@ -42,15 +40,24 @@ open class ActorService : CreativesServiceImpl<Actor?, ActorRepository?>() {
 
     @Throws(CreativesNotFoundException::class, CreativesDeletionException::class)
     override fun delete(id: Long?) {
-        val actorOpt = creativesRepository!!.findById(id)
-        if (actorOpt.isEmpty) {
+        val actorOpt = creativesRepository?.findById(id)
+        if (!id?.let { actorExists(it) }!!) {
             throw CreativesNotFoundException(ErrorMessages.ACTOR_NOT_FOUND)
         }
-        val actor = actorOpt.get()
-        val movies = movieService!!.getMoviesByActor(id)
-        if (!movies!!.isEmpty()) {
-            throw CreativesDeletionException(ErrorMessages.CAN_NOT_DELETE_ACTOR)
+        try {
+            if (actorOpt != null) {
+                creativesRepository?.delete(actorOpt.get())
+            }
+        } catch (e: Exception) {
+            throw CreativesDeletionException(ErrorMessages.CAN_NOT_DELETE_ACTOR_IN_MOVIE)
         }
-        creativesRepository!!.delete(actor)
+    }
+
+    fun actorExists(actorId: Long): Boolean {
+        val actorOpt = creativesRepository?.findById(actorId)
+        if (actorOpt != null) {
+            return actorOpt.isPresent
+        }
+        return false;
     }
 }

@@ -33,4 +33,8 @@ class Movie : Media() {
     */
     var actors: Set<Actor> = HashSet()
 
+    override fun toString(): String {
+        return "Movie(id=$id, title=$title, releaseDate=$releaseDate, actors=$actors)"
+    }
+
 }

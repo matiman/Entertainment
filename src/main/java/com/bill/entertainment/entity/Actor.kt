@@ -17,4 +17,7 @@ class Actor : Creatives() {
     @Nonnull
     var name: String? = null
 
+    override fun toString(): String {
+        return "Actor(id=$id, name=$name)"
+    }
 }

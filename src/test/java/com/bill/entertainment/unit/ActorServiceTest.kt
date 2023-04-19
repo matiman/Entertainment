@@ -45,19 +45,4 @@ class ActorServiceTest {
         )
     }
 
-//    @Test
-//    fun testDeleteActorInMovie() {
-//        val actor = Actor()
-//        actor.id = 1L
-//        actor.name = "John Doe"
-//        val movie = Movie()
-//        movie.id = 1L
-//        movie.title = "Test Movie"
-//        movie.releaseDate = LocalDate.of(2023, 4, 17)
-//        movie.actors = setOf(actor)
-//        Mockito.`when`(repository!!.findById(1L)).thenReturn(Optional.ofNullable(actor).map { it })
-//        Mockito.`when`(movieService!!.getMoviesByActor(ArgumentMatchers.anyLong())).thenReturn(listOf(movie))
-//        Assertions.assertThrows(CreativesDeletionException::class.java) { actorService!!.delete(1L) }
-//        Mockito.verify(repository, Mockito.never()).delete(actor)
-//    }
 }
